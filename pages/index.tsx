@@ -1,9 +1,5 @@
 import React from "react";
 
-// type TData = {
-//   data: { userId: string; id: string; title: string; completed: string };
-// };
-
 type TProps = { message: string };
 
 // This gets called on every request
@@ -29,13 +25,6 @@ export async function getServerSideProps() {
 
 const Index: React.FC<TProps> = ({ message }) => {
   console.log("FIND ME!");
-  // useEffect(() => {
-  //   if (message) {
-  //     window.location.href = "/500";
-  //     console.error("!!!");
-  //   }
-  // }, [message]);
-
   return <div>Incoming data: {message}</div>;
 };
 
