@@ -14,8 +14,9 @@ export type TPostProps = {
 
 // This gets called on every request
 export async function getServerSideProps() {
-  // Fetch data from external API
+  // Example logic block. May be FEATURE_TOGGLE or AUTHORISATION_CHECK or etc.
   try {
+    // Fetch data from external API
     const posts: TPost[] = await fetch(
       "https://jsonplaceholder.typicode.com/posts?_start=0&_limit=2",
     ).then((response) => response.json());

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 type TUser = {
   id: string;
@@ -27,14 +27,18 @@ type TUser = {
 const Users: React.FC = () => {
   // console.log("FIND Users");
   const [users, setUsers] = React.useState<TUser[]>([]);
+
   // Fetch data from external API
-  try {
-    fetch("https://jsonplaceholder.typicode.com/users?_start=0&_limit=2")
-      .then((response) => response.json())
-      .then((data) => setUsers(data));
-  } catch ({ message }) {
-    console.error(message);
-  }
+  useEffect(() => {
+    try {
+      fetch("https://jsonplaceholder.typicode.com/users?_start=0&_limit=2")
+        .then((response) => response.json())
+        .then((data) => setUsers(data));
+    } catch ({ message }) {
+      console.error(message);
+    }
+  }, []);
+
   return (
     <div>
       <h1>Restricted Area</h1>
