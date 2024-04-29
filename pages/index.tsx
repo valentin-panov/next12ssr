@@ -1,16 +1,26 @@
+import Users from "components/users";
 import React from "react";
+import Posts from "../components/posts";
 
-type TProps = { message: string };
+export type TPost = {
+  id: string;
+  title: string;
+  body: string;
+  userId: string;
+};
+export type TPostProps = {
+  posts: TPost[];
+};
 
 // This gets called on every request
 export async function getServerSideProps() {
   // Fetch data from external API
   try {
-    const { title } = await fetch(
-      "https://jsonplaceholder.typicode.com/todos/1",
+    const posts: TPost[] = await fetch(
+      "https://jsonplaceholder.typicode.com/posts?_start=0&_limit=2",
     ).then((response) => response.json());
     // Pass data to the page via props
-    return { props: { message: title } };
+    return { props: { posts } };
   } catch ({ message }) {
     console.error(message);
     // Pass data to the page via props
@@ -23,9 +33,15 @@ export async function getServerSideProps() {
   }
 }
 
-const Index: React.FC<TProps> = ({ message }) => {
-  console.log("FIND ME!");
-  return <div>Incoming data: {message}</div>;
+const Index: React.FC<TPostProps> = ({ posts }) => {
+  // console.log("FIND Index");
+  return (
+    <div>
+      <h1>Protected page</h1>
+      <Posts posts={posts} />
+      <Users />
+    </div>
+  );
 };
 
 export default Index;
