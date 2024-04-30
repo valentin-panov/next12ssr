@@ -2,7 +2,7 @@ import { TPost, TPostProps } from "pages";
 import React from "react";
 
 const Posts: React.FC<TPostProps> = ({ posts }) => {
-  // console.log("FIND_ME_Posts");
+  console.log("FIND_ME_Posts");
   return (
     <div style={{ width: "20vw" }}>
       <h2>Posts</h2>

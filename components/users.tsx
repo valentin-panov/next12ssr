@@ -25,7 +25,7 @@ type TUser = {
 };
 
 const Users: React.FC = () => {
-  // console.log("FIND_ME_Users");
+  console.log("FIND_ME_Users");
   const [users, setUsers] = React.useState<TUser[]>([]);
 
   // Fetch data from external API

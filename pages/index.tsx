@@ -66,7 +66,7 @@ const getCookieRole = () => {
 };
 
 const Index: React.FC<TPostProps> = ({ posts }) => {
-  // console.log("FIND_ME_Index");
+  console.log("FIND_ME_Index");
   const [role, setRole] = React.useState<string>("user");
   useEffect(() => {
     setRole(getCookieRole());
