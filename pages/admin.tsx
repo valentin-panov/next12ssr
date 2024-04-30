@@ -3,6 +3,8 @@ import { GetServerSidePropsContext } from "next";
 import { TCookies } from "./index";
 
 const Admin: React.FC = () => {
+  // console.log('FIND_ME_Admin')
+
   return (
     <div
       style={{
