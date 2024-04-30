@@ -16,7 +16,7 @@ export type TCookies = {
   [key: string]: string;
 };
 
-// This gets called on every request
+// This gets called on every request on the server side
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   // Example logic block. May be FEATURE_TOGGLE or AUTHORISATION_CHECK or etc.
 
@@ -65,6 +65,7 @@ const getCookieRole = () => {
   return cookieValue || "user";
 };
 
+// This is the client side logic
 const Index: React.FC<TPostProps> = ({ posts }) => {
   console.log("FIND_ME_Index");
   const [role, setRole] = React.useState<string>("user");
