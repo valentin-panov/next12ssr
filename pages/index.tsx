@@ -12,7 +12,7 @@ export type TPost = {
 export type TPostProps = {
   posts: TPost[];
 };
-type TCookies = {
+export type TCookies = {
   [key: string]: string;
 };
 
@@ -57,18 +57,38 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 }
 
+const getCookieRole = () => {
+  const cookieValue = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("role="))
+    ?.split("=")[1];
+  return cookieValue || "user";
+};
+
 const Index: React.FC<TPostProps> = ({ posts }) => {
-  // console.log("FIND Index");
+  // console.log("FIND_ME_Index");
   const [role, setRole] = React.useState<string>("user");
   useEffect(() => {
-    setRole(localStorage.getItem("role") || "");
+    setRole(getCookieRole());
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("role");
     document.cookie = "auth-token=; Max-Age=-99999999;";
+    document.cookie = "role=; Max-Age=-99999999;";
     window.location.href = "/";
   };
+
+  const switchRole = () => {
+    const settedRole = getCookieRole();
+    if (settedRole !== "admin") {
+      setRole("admin");
+      document.cookie = "role=admin; SameSite=Strict; Secure";
+    } else {
+      setRole("user");
+      document.cookie = "role=user; SameSite=Strict; Secure";
+    }
+  };
+
   return (
     <div>
       <h1>Protected page</h1>
@@ -76,7 +96,8 @@ const Index: React.FC<TPostProps> = ({ posts }) => {
       <div style={{ display: "flex", justifyContent: "space-evenly" }}>
         <Posts posts={posts} />
         <div>
-          Your role: {role}
+          <p>Your role: {role}</p>
+          <button onClick={switchRole}>Switch role</button>
           {role === "admin" && <Users />}
         </div>
       </div>

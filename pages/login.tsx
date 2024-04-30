@@ -1,9 +1,10 @@
 import React from "react";
 
 const Login: React.FC = () => {
+  // console.log('FIND_ME_Login')
   const onClick = () => {
-    localStorage.setItem("role", "user");
     document.cookie = "auth-token=0010; SameSite=Strict; Secure";
+    document.cookie = "role=user; SameSite=Strict; Secure";
     window.location.href = "/";
   };
   return (
