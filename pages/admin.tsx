@@ -17,6 +17,9 @@ const Admin: React.FC = () => {
       }}
     >
       <h1>Admin Space</h1>
+      <button onClick={() => (window.location.href = "/")}>
+        Back to index
+      </button>
     </div>
   );
 };
