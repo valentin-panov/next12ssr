@@ -25,7 +25,7 @@ type TUser = {
 };
 
 const Users: React.FC = () => {
-  // console.log("FIND Users");
+  // console.log("FIND_ME_Users");
   const [users, setUsers] = React.useState<TUser[]>([]);
 
   // Fetch data from external API
@@ -40,12 +40,12 @@ const Users: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Restricted Area</h1>
-      <h2>Users</h2>
+    <div style={{ width: "20vw" }}>
+      <h2>Restricted Access Area</h2>
+      <h3>Users</h3>
       {users.map((user: TUser) => (
         <div key={user.id}>
-          <h3>ID: {user.id}</h3>
+          <h4>ID: {user.id}</h4>
           <p>Name: {user.name}</p>
           <p>Username: {user.username}</p>
           <p>Email: {user.email}</p>
