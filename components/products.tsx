@@ -1,5 +1,5 @@
-import { TProduct, TProductProps } from "pages";
 import React from "react";
+import { TProduct, TProductProps } from "types";
 
 const Products: React.FC<TProductProps> = ({ products }) => {
   console.log("FIND_ME_Posts");
