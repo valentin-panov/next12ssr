@@ -3,34 +3,8 @@ import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import React, { useEffect } from "react";
 import Products from "../components/products";
 import * as process from "node:process";
-
-export type TProduct = {
-  id: string;
-  title: string;
-  price: string;
-  description: string;
-  category: {
-    id: string;
-    name: string;
-    image: string;
-  };
-  images: [string, string, string];
-};
-export type TProductProps = {
-  products: TProduct[];
-};
-export type TCookies = {
-  [key: string]: string;
-};
-export type TProfile = {
-  id: string;
-  email: string;
-  password: string;
-  name: string;
-  role: "customer" | "admin";
-  avatar: string;
-};
-export type TResponse = TProfile & { message: string; statusCode: number };
+import { TProduct, TProductProps, TProfileResponse } from "types";
+import { getCookieRole, headerCookieParse, logout } from "utils";
 
 // This gets called on every request on the server side
 export const getServerSideProps: GetServerSideProps = async (
@@ -39,13 +13,7 @@ export const getServerSideProps: GetServerSideProps = async (
   // Example logic block. May be FEATURE_TOGGLE or AUTHORISATION_CHECK or etc.
 
   // Get cookies and try to find the token
-  const cookiesString = context.req.headers.cookie;
-  const cookies: TCookies = {};
-  cookiesString &&
-    cookiesString.split(";").forEach((cookie: string) => {
-      const [key, value] = cookie.split("=").map((c) => c.trim());
-      cookies[key] = value;
-    });
+  const cookies = headerCookieParse(context.req.headers.cookie);
   const token = cookies["access_token"];
   // only authorised user may access the page
   if (!token) {
@@ -56,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   } else {
-    const response: TResponse = await fetch(
+    const response: TProfileResponse = await fetch(
       "https://api.escuelajs.co/api/v1/auth/profile",
       {
         method: "GET",
@@ -108,14 +76,6 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 };
 
-const getCookieRole = () => {
-  const cookieValue = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("role="))
-    ?.split("=")[1];
-  return cookieValue || "customer";
-};
-
 // This is the client side logic
 const Index: React.FC<TProductProps> = ({ products }) => {
   console.log("FIND_ME_Index");
@@ -123,12 +83,6 @@ const Index: React.FC<TProductProps> = ({ products }) => {
   useEffect(() => {
     setRole(getCookieRole());
   }, []);
-
-  const logout = () => {
-    document.cookie = "access_token=; Max-Age=-99999999;";
-    document.cookie = "role=; Max-Age=-99999999;";
-    window.location.href = "/";
-  };
 
   const switchRole = () => {
     const settedRole = getCookieRole();

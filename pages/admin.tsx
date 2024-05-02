@@ -1,6 +1,6 @@
 import React from "react";
 import { GetServerSidePropsContext } from "next";
-import { TCookies } from "./index";
+import { headerCookieParse } from "utils";
 
 const Admin: React.FC = () => {
   console.log("FIND_ME_Admin");
@@ -28,13 +28,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   // Example logic block. May be FEATURE_TOGGLE or AUTHORISATION_CHECK or etc.
 
   // Get cookies and try to find the token
-  const cookiesString = context.req.headers.cookie;
-  const cookies: TCookies = {};
-  cookiesString &&
-    cookiesString.split(";").forEach((cookie: string) => {
-      const [key, value] = cookie.split("=").map((c) => c.trim());
-      cookies[key] = value;
-    });
+  const cookies = headerCookieParse(context.req.headers.cookie);
   const token = cookies["access_token"];
   if (!token) {
     return {
