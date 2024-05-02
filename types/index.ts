@@ -12,13 +12,15 @@ export type TProduct = {
 };
 export type TProductProps = {
   products: TProduct[];
+  profile: TProfile;
 };
+export type TRole = "customer" | "admin";
 export type TProfile = {
   id: string;
   email: string;
   password: string;
   name: string;
-  role: "customer" | "admin";
+  role: TRole;
   avatar: string;
 };
 export type TProfileResponse = TProfile & {
@@ -28,4 +30,9 @@ export type TProfileResponse = TProfile & {
 
 export type TCookies = {
   [key: string]: string;
+};
+
+export type TCreds = {
+  email: string;
+  password: string;
 };

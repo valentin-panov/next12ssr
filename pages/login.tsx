@@ -1,11 +1,12 @@
 import React from "react";
+import { TCreds, TRole } from "../types";
 
-const auth = async () => {
+const auth = async ({ email, password }: TCreds) => {
   const res = await fetch("https://api.escuelajs.co/api/v1/auth/login", {
     method: "POST",
     body: JSON.stringify({
-      email: "john@mail.com",
-      password: "changeme",
+      email,
+      password,
     }),
     headers: {
       "Content-Type": "application/json",
@@ -16,10 +17,25 @@ const auth = async () => {
 
 const Login: React.FC = () => {
   console.log("FIND_ME_Login");
-  const onClick = async () => {
-    const { access_token } = await auth();
-    document.cookie = `access_token=${access_token}; SameSite=Strict; Secure`;
-    window.location.href = "/";
+  const onClick = async (role: TRole) => {
+    const data =
+      role === "customer"
+        ? {
+            email: "john@mail.com",
+            password: "changeme",
+          }
+        : {
+            email: "admin@mail.com",
+            password: "admin123",
+          };
+    const { access_token } = await auth(data);
+    if (access_token) {
+      document.cookie = `access_token=${access_token}; SameSite=Strict; Secure`;
+      window.location.href = "/";
+    } else {
+      // generic error handler
+      console.log("access restricted");
+    }
   };
   return (
     <div
@@ -33,7 +49,9 @@ const Login: React.FC = () => {
       }}
     >
       <h1>Login Page</h1>
-      <button onClick={onClick}>User login</button>
+      <button onClick={() => onClick("customer")}>User login</button>
+      <p>or</p>
+      <button onClick={() => onClick("admin")}>Admin login</button>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { GetServerSidePropsContext } from "next";
 import { headerCookieParse } from "utils";
+import { profileService } from "../services";
 
 const Admin: React.FC = () => {
   console.log("FIND_ME_Admin");
@@ -37,16 +38,24 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     };
-  }
-
-  const role = cookies["role"];
-  if (role !== "admin") {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
+  } else {
+    const profile = await profileService(token);
+    // case of invalid token came from the frontend side
+    if (profile.statusCode == 401) {
+      return {
+        redirect: {
+          destination: "/login",
+          permanent: false,
+        },
+      };
+    } else if (profile.role !== "admin") {
+      return {
+        redirect: {
+          destination: "/",
+          permanent: false,
+        },
+      };
+    }
   }
 
   return { props: {} };

@@ -1,10 +1,11 @@
 import Users from "components/users";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import React, { useEffect } from "react";
+import React from "react";
 import Products from "../components/products";
 import * as process from "node:process";
-import { TProduct, TProductProps, TProfileResponse } from "types";
-import { getCookieRole, headerCookieParse, logout } from "utils";
+import { TProduct, TProductProps, TProfileResponse, TRole } from "types";
+import { headerCookieParse, logout } from "utils";
+import { profileService } from "services"; // This gets called on every request on the server side
 
 // This gets called on every request on the server side
 export const getServerSideProps: GetServerSideProps = async (
@@ -15,6 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (
   // Get cookies and try to find the token
   const cookies = headerCookieParse(context.req.headers.cookie);
   const token = cookies["access_token"];
+  let profile: TProfileResponse;
   // only authorised user may access the page
   if (!token) {
     return {
@@ -24,29 +26,15 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   } else {
-    const response: TProfileResponse = await fetch(
-      "https://api.escuelajs.co/api/v1/auth/profile",
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    ).then((response) => response.json());
+    profile = await profileService(token);
     // case of invalid token came from the frontend side
-    if (response.statusCode == 401) {
+    if (profile.statusCode == 401) {
       return {
         redirect: {
           destination: "/login",
           permanent: false,
         },
       };
-    } else {
-      context.res.setHeader(
-        "Set-Cookie",
-        `role=${response.role}; SameSite=Strict; Secure`,
-      );
     }
   }
 
@@ -63,10 +51,9 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     ).then((response) => response.json());
     // Pass data to the page via props
-    return { props: { products } };
+    return { props: { products, profile } };
   } catch ({ message }) {
     console.error(message);
-    // Pass data to the page via props
     return {
       redirect: {
         destination: "/500",
@@ -77,21 +64,15 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 // This is the client side logic
-const Index: React.FC<TProductProps> = ({ products }) => {
+const Index: React.FC<TProductProps> = ({ products, profile }) => {
   console.log("FIND_ME_Index");
-  const [role, setRole] = React.useState<string>("customer");
-  useEffect(() => {
-    setRole(getCookieRole());
-  }, []);
+  const [role, setRole] = React.useState<TRole>(profile.role);
 
   const switchRole = () => {
-    const settedRole = getCookieRole();
-    if (settedRole !== "admin") {
+    if (role !== "admin") {
       setRole("admin");
-      document.cookie = "role=admin; SameSite=Strict; Secure";
     } else {
       setRole("customer");
-      document.cookie = "role=customer; SameSite=Strict; Secure";
     }
   };
 
@@ -102,6 +83,8 @@ const Index: React.FC<TProductProps> = ({ products }) => {
       <div style={{ display: "flex", justifyContent: "space-evenly" }}>
         <Products products={products} />
         <div>
+          <p>Name: {profile.name}</p>
+          <p>Email: {profile.email}</p>
           <p>Your role: {role}</p>
           <button onClick={switchRole}>Switch role</button>
           {role === "admin" && <Users />}
