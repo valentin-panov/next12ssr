@@ -2,26 +2,11 @@ import React, { useEffect } from "react";
 
 type TUser = {
   id: string;
-  name: string;
-  username: string;
   email: string;
-  address: {
-    street: string;
-    suite: string;
-    city: string;
-    zipcode: string;
-    geo: {
-      lat: string;
-      lng: string;
-    };
-  };
-  phone: string;
-  website: string;
-  company: {
-    name: string;
-    catchPhrase: string;
-    bs: string;
-  };
+  password: string;
+  name: string;
+  role: string;
+  avatar: string;
 };
 
 const Users: React.FC = () => {
@@ -31,7 +16,7 @@ const Users: React.FC = () => {
   // Fetch data from external API
   useEffect(() => {
     try {
-      fetch("https://jsonplaceholder.typicode.com/users?_start=0&_limit=2")
+      fetch("https://api.escuelajs.co/api/v1/users?limit=4")
         .then((response) => response.json())
         .then((data) => setUsers(data));
     } catch ({ message }) {
@@ -43,12 +28,12 @@ const Users: React.FC = () => {
     <div style={{ width: "20vw" }}>
       <h2>Restricted Access Area</h2>
       <h3>Users</h3>
-      {users.map((user: TUser) => (
-        <div key={user.id}>
-          <h4>ID: {user.id}</h4>
-          <p>Name: {user.name}</p>
-          <p>Username: {user.username}</p>
-          <p>Email: {user.email}</p>
+      {users.map(({ id, name, email, role }: TUser) => (
+        <div key={id}>
+          <h4>ID: {id}</h4>
+          <p>Name: {name}</p>
+          <p>Email: {email}</p>
+          <p>Role: {role}</p>
         </div>
       ))}
     </div>

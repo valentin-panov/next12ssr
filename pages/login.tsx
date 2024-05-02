@@ -1,10 +1,24 @@
 import React from "react";
 
+const auth = async () => {
+  const res = await fetch("https://api.escuelajs.co/api/v1/auth/login", {
+    method: "POST",
+    body: JSON.stringify({
+      email: "john@mail.com",
+      password: "changeme",
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return res.json();
+};
+
 const Login: React.FC = () => {
   console.log("FIND_ME_Login");
-  const onClick = () => {
-    document.cookie = "auth-token=0010; SameSite=Strict; Secure";
-    document.cookie = "role=user; SameSite=Strict; Secure";
+  const onClick = async () => {
+    const { access_token } = await auth();
+    document.cookie = `access_token=${access_token}; SameSite=Strict; Secure`;
     window.location.href = "/";
   };
   return (

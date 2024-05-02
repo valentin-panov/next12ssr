@@ -35,7 +35,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       const [key, value] = cookie.split("=").map((c) => c.trim());
       cookies[key] = value;
     });
-  const token = cookies["auth-token"];
+  const token = cookies["access_token"];
   if (!token) {
     return {
       redirect: {

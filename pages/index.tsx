@@ -1,23 +1,41 @@
 import Users from "components/users";
-import { GetServerSidePropsContext } from "next";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import React, { useEffect } from "react";
-import Posts from "../components/posts";
+import Products from "../components/products";
+import * as process from "node:process";
 
-export type TPost = {
+export type TProduct = {
   id: string;
   title: string;
-  body: string;
-  userId: string;
+  price: string;
+  description: string;
+  category: {
+    id: string;
+    name: string;
+    image: string;
+  };
+  images: [string, string, string];
 };
-export type TPostProps = {
-  posts: TPost[];
+export type TProductProps = {
+  products: TProduct[];
 };
 export type TCookies = {
   [key: string]: string;
 };
+export type TProfile = {
+  id: string;
+  email: string;
+  password: string;
+  name: string;
+  role: "customer" | "admin";
+  avatar: string;
+};
+export type TResponse = TProfile & { message: string; statusCode: number };
 
 // This gets called on every request on the server side
-export async function getServerSideProps(context: GetServerSidePropsContext) {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext,
+) => {
   // Example logic block. May be FEATURE_TOGGLE or AUTHORISATION_CHECK or etc.
 
   // Get cookies and try to find the token
@@ -28,7 +46,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       const [key, value] = cookie.split("=").map((c) => c.trim());
       cookies[key] = value;
     });
-  const token = cookies["auth-token"];
+  const token = cookies["access_token"];
+  // only authorised user may access the page
   if (!token) {
     return {
       redirect: {
@@ -36,15 +55,47 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         permanent: false,
       },
     };
+  } else {
+    const response: TResponse = await fetch(
+      "https://api.escuelajs.co/api/v1/auth/profile",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    ).then((response) => response.json());
+    // case of invalid token came from the frontend side
+    if (response.statusCode == 401) {
+      return {
+        redirect: {
+          destination: "/login",
+          permanent: false,
+        },
+      };
+    } else {
+      context.res.setHeader(
+        "Set-Cookie",
+        `role=${response.role}; SameSite=Strict; Secure`,
+      );
+    }
   }
 
   // Fetch data from external API
   try {
-    const posts: TPost[] = await fetch(
-      "https://jsonplaceholder.typicode.com/posts?_start=0&_limit=2",
+    const products: TProduct[] = await fetch(
+      "https://api.escuelajs.co/api/v1/products?offset=0&limit=3",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          PAYED_SUBSCRIPTION_TOKEN: `${process.env.PAYED_SUBSCRIPTION_TOKEN}`,
+        },
+      },
     ).then((response) => response.json());
     // Pass data to the page via props
-    return { props: { posts } };
+    return { props: { products } };
   } catch ({ message }) {
     console.error(message);
     // Pass data to the page via props
@@ -55,26 +106,26 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
-}
+};
 
 const getCookieRole = () => {
   const cookieValue = document.cookie
     .split("; ")
     .find((row) => row.startsWith("role="))
     ?.split("=")[1];
-  return cookieValue || "user";
+  return cookieValue || "customer";
 };
 
 // This is the client side logic
-const Index: React.FC<TPostProps> = ({ posts }) => {
+const Index: React.FC<TProductProps> = ({ products }) => {
   console.log("FIND_ME_Index");
-  const [role, setRole] = React.useState<string>("user");
+  const [role, setRole] = React.useState<string>("customer");
   useEffect(() => {
     setRole(getCookieRole());
   }, []);
 
   const logout = () => {
-    document.cookie = "auth-token=; Max-Age=-99999999;";
+    document.cookie = "access_token=; Max-Age=-99999999;";
     document.cookie = "role=; Max-Age=-99999999;";
     window.location.href = "/";
   };
@@ -85,8 +136,8 @@ const Index: React.FC<TPostProps> = ({ posts }) => {
       setRole("admin");
       document.cookie = "role=admin; SameSite=Strict; Secure";
     } else {
-      setRole("user");
-      document.cookie = "role=user; SameSite=Strict; Secure";
+      setRole("customer");
+      document.cookie = "role=customer; SameSite=Strict; Secure";
     }
   };
 
@@ -95,7 +146,7 @@ const Index: React.FC<TPostProps> = ({ posts }) => {
       <h1>Protected page</h1>
       <button onClick={logout}>Logout</button>
       <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-        <Posts posts={posts} />
+        <Products products={products} />
         <div>
           <p>Your role: {role}</p>
           <button onClick={switchRole}>Switch role</button>
