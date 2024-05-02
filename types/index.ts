@@ -10,9 +10,12 @@ export type TProduct = {
   };
   images: [string, string, string];
 };
-export type TProductProps = {
+export type TIndexProps = {
   products: TProduct[];
   profile: TProfile;
+};
+export type TProductProps = {
+  products: TProduct[];
 };
 export type TRole = "customer" | "admin";
 export type TProfile = {

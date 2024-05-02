@@ -3,7 +3,7 @@ import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import React from "react";
 import Products from "../components/products";
 import * as process from "node:process";
-import { TProduct, TProductProps, TProfileResponse, TRole } from "types";
+import { TIndexProps, TProduct, TProfileResponse, TRole } from "types";
 import { headerCookieParse, logout } from "utils";
 import { profileService } from "services"; // This gets called on every request on the server side
 
@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 // This is the client side logic
-const Index: React.FC<TProductProps> = ({ products, profile }) => {
+const Index: React.FC<TIndexProps> = ({ products, profile }) => {
   console.log("FIND_ME_Index");
   const [role, setRole] = React.useState<TRole>(profile.role);
 
