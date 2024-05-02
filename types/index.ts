@@ -10,14 +10,18 @@ export type TProduct = {
   };
   images: [string, string, string];
 };
+
 export type TIndexProps = {
   products: TProduct[];
   profile: TProfile;
 };
+
 export type TProductProps = {
   products: TProduct[];
 };
+
 export type TRole = "customer" | "admin";
+
 export type TProfile = {
   id: string;
   email: string;
@@ -26,6 +30,7 @@ export type TProfile = {
   role: TRole;
   avatar: string;
 };
+
 export type TProfileResponse = TProfile & {
   message: string;
   statusCode: number;
