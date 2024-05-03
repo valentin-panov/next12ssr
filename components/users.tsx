@@ -16,7 +16,13 @@ const Users: React.FC = () => {
   // Fetch data from external API
   useEffect(() => {
     try {
-      fetch("https://api.escuelajs.co/api/v1/users?limit=4")
+      fetch("https://api.escuelajs.co/api/v1/users?limit=4", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          SECRET_API_KEY: `${process.env.NEXT_PUBLIC_SECRET_API_KEY}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => setUsers(data));
     } catch ({ message }) {
