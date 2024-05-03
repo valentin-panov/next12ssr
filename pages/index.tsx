@@ -80,6 +80,10 @@ const Index: React.FC<TIndexProps> = ({ products, profile }) => {
     <div>
       <h1>Protected page</h1>
       <button onClick={logout}>Logout</button>
+      <p>
+        <a href={"/admin"}>ADMIN SPACE &quot;/admin&quot;</a>
+      </p>
+
       <div style={{ display: "flex", justifyContent: "space-evenly" }}>
         <Products products={products} />
         <div>
